@@ -6,5 +6,8 @@
   "description": "Formulario de cadastro de bingos protegidos - alimenta a aba do BI Sportsbook",
   "engines": {
     "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node servidor.js"
   }
 }
