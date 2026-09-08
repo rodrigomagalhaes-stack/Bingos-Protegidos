@@ -1,0 +1,10 @@
+{
+  "name": "bingos-protegidos",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Formulario de cadastro de bingos protegidos - alimenta a aba do BI Sportsbook",
+  "engines": {
+    "node": ">=20"
+  }
+}
