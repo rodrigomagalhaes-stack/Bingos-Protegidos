@@ -16,14 +16,17 @@ precisa ter sido aplicado antes de este formulário servir para alguma coisa.
 
 ## Os campos
 
-Nome do tipster, stake, link do bilhete e as datas dos confrontos — mais quem
-está cadastrando e uma observação, os dois opcionais.
+Quatro, e nenhum opcional: nome do tipster, stake, link do bilhete e as datas
+dos confrontos.
 
-O nome do tipster é **texto livre**. Quem preenche precisa escrever sempre do
-mesmo jeito: o BI agrupa os bilhetes por esse nome, e uma grafia diferente vira
-outro tipster nos totais. O que dá para automatizar contra isso já está feito —
-espaço sobrando é removido no servidor, e a coluna `tipster_chave` do banco
-junta maiúsculas e minúsculas. Acento continua separando ("joao" ≠ "joão").
+O nome do tipster é **texto livre**, e quem agrupa é o banco: `tipster_chave` é
+uma coluna gerada em que caixa, espaço sobrando e acento não separam. "Rodrigo"
+hoje e "rodrigo" amanhã caem no mesmo tipster. O que ela não junta é nome de
+verdade diferente — "Rodrigo" e "Rodrigo M." continuam sendo dois.
+
+Não há campo de "quem está cadastrando": como a URL é aberta, esse nome seria
+digitado por qualquer um e não provaria nada. Fica sem rastro de autoria, de
+propósito.
 
 ## Por que ele não fala com o Supabase pelo navegador
 
