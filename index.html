@@ -104,15 +104,15 @@
 
   .titulo {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 16px;
     margin-bottom: 26px;
   }
 
-  .titulo .escudo { flex: none; margin-top: 2px; color: var(--acc); }
+  .titulo .escudo { flex: none; color: var(--acc); }
 
   .titulo h1 {
-    margin: 0 0 6px;
+    margin: 0;
     font-size: 34px;
     font-weight: 800;
     letter-spacing: -0.03em;
@@ -120,14 +120,6 @@
   }
 
   .titulo h1 em { font-style: normal; color: var(--acc); }
-
-  .titulo p {
-    margin: 0;
-    max-width: 42ch;
-    font-size: 14.5px;
-    line-height: 1.5;
-    color: var(--t2);
-  }
 
   /* ── cartão ──────────────────────────────────────────────────────────── */
 
@@ -213,38 +205,6 @@
   .campo input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: .8; }
 
   /* ── datas ───────────────────────────────────────────────────────────── */
-
-  .linha-data { display: flex; gap: 12px; }
-  .linha-data .campo { flex: 1; }
-
-  .btn-mais {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    flex: none;
-    padding: 0 20px;
-    border: 1px solid var(--linha);
-    border-radius: 14px;
-    background: var(--campo);
-    color: var(--t1);
-    font-family: inherit;
-    font-size: 14.5px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: border-color .15s, background .15s;
-  }
-
-  .btn-mais:hover { border-color: var(--linha-2); background: var(--campo-2); }
-
-  .btn-mais i {
-    display: grid;
-    place-items: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--acc);
-    color: #fff;
-  }
 
   .chips {
     display: flex;
@@ -389,8 +349,6 @@
     .titulo h1 { font-size: 27px; }
     .marca { font-size: 25px; }
     .cartao { padding: 22px 18px; }
-    .linha-data { flex-wrap: wrap; }
-    .btn-mais { width: 100%; justify-content: center; }
   }
 </style>
 </head>
@@ -409,7 +367,6 @@
 
     <div>
       <h1>Bingos <em>Protegidos</em></h1>
-      <p>Cadastre os detalhes do seu bilhete para garantir a proteção do seu bingo.</p>
     </div>
   </div>
 
@@ -492,27 +449,15 @@
 
       <div class="chips" id="chips"></div>
 
-      <div class="linha-data">
-        <div class="campo">
-          <span class="campo-ico">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
-              <path d="M3.5 9.8h17M8 3.5v3M16 3.5v3" />
-            </svg>
-          </span>
-          <input type="date" id="data" />
-        </div>
-
-        <button type="button" class="btn-mais" id="btn-data">
-          <i>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="3" stroke-linecap="round" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </i>
-          Acrescentar
-        </button>
+      <div class="campo">
+        <span class="campo-ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+            <path d="M3.5 9.8h17M8 3.5v3M16 3.5v3" />
+          </svg>
+        </span>
+        <input type="date" id="data" />
       </div>
     </div>
 
@@ -587,7 +532,11 @@ function desenharChips() {
   }
 }
 
-$('btn-data').onclick = () => {
+// A data escolhida vira etiqueta sozinha. Antes havia um botão
+// "Acrescentar" no meio do caminho: um clique a mais para dizer o que a
+// escolha já tinha dito, e a origem certa de bilhete cadastrado sem data —
+// quem escolhia e não clicava perdia a data sem nenhum aviso.
+$('data').onchange = () => {
   const v = $('data').value
   if (!v) return
   if (!datas.includes(v)) datas.push(v)
