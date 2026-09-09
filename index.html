@@ -114,7 +114,9 @@
 
   input:focus { outline: 2px solid var(--acc); outline-offset: -1px; }
 
-  .dica { margin: -9px 0 14px; font-size: 11.5px; color: var(--t3); }
+  .so-rotulo, .so-rotulo > span { margin-bottom: 0; }
+
+  .dica { margin: 0 0 9px; font-size: 11.5px; color: var(--t3); }
 
   button {
     padding: 10px 16px;
@@ -196,9 +198,6 @@
       <span>Nome do tipster</span>
       <input type="text" id="tipster" autocomplete="off" required />
     </label>
-    <p class="dica">
-      Maiúscula, acento e espaço não separam: "rodrigo" e "Rodrigo" são o mesmo.
-    </p>
 
     <label>
       <span>Stake do bilhete (R$)</span>
@@ -210,15 +209,13 @@
       <input type="url" id="link" placeholder="https://…" required />
     </label>
 
-    <label><span>Datas dos confrontos</span></label>
+    <label class="so-rotulo"><span>Datas dos confrontos</span></label>
+    <p class="dica">A data que os confrontos ocorreram</p>
     <div class="datas" id="chips"></div>
     <div class="linha-data">
       <input type="date" id="data" />
       <button type="button" id="btn-data">Acrescentar</button>
     </div>
-    <p class="dica">
-      A data que os confrontos ocorreram
-    </p>
 
     <p class="recado erro oculto" id="erro"></p>
 
