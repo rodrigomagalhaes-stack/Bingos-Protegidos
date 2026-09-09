@@ -5,229 +5,545 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Cadastro de Bingos Protegidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  /* As mesmas variáveis do portal, para as duas telas parecerem a mesma casa.
-     Copiadas, e não importadas: este projeto sobe sozinho na Vercel e não pode
-     depender de um arquivo que vive no outro. */
+  /* Tema escuro fixo, e não `prefers-color-scheme`: esta é uma peça de marca,
+     e a versão clara descaracterizaria o laranja sobre preto que a identifica.
+     Manrope é a mesma fonte do portal — as duas telas são a mesma casa. */
   :root {
-    --bg: #f6f5f3;
-    --surface: #ffffff;
-    --surface-2: #f1efec;
-    --linha: rgba(20, 18, 16, .10);
-    --t1: #221f1c;
-    --t2: #5a5551;
-    --t3: #6e6a66;
-    --acc: #ff3d00;
-    --acc-2: #e03400;
-    --verde: #15803d;
-    --verde-soft: rgba(21, 128, 61, .09);
-    --vermelho: #dc2626;
-    --vermelho-soft: rgba(220, 38, 38, .09);
-    --sombra: 0 14px 30px -16px rgba(20, 18, 16, .18);
-  }
+    color-scheme: dark;   /* faz o seletor nativo de data vir escuro também */
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #121314;
-      --surface: #1a1c1e;
-      --surface-2: #212325;
-      --linha: rgba(255, 255, 255, .09);
-      --t1: #f5f4f1;
-      --t2: #a3a8a8;
-      --t3: #8a9091;
-      --acc: #ff3d00;
-      --acc-2: #ff5c26;
-      --verde: #3ecf98;
-      --verde-soft: rgba(62, 207, 152, .13);
-      --vermelho: #ff5470;
-      --vermelho-soft: rgba(255, 84, 112, .13);
-      --sombra: 0 14px 30px -16px rgba(0, 0, 0, .6);
-    }
+    --bg: #0a0a0c;
+    --card: #131417;
+    --campo: #1a1c20;
+    --campo-2: #202329;
+    --linha: rgba(255, 255, 255, .07);
+    --linha-2: rgba(255, 255, 255, .12);
+
+    --t1: #f3f4f6;
+    --t2: #a6abb4;
+    --t3: #767c86;
+
+    --acc: #ff4d0a;
+    --acc-2: #ff7a2e;
+    --acc-soft: rgba(255, 77, 10, .12);
+
+    --verde: #3ecf98;
+    --vermelho: #ff5470;
+    --vermelho-soft: rgba(255, 84, 112, .12);
+
+    --sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
   }
 
   * { box-sizing: border-box; }
 
   body {
+    position: relative;
     margin: 0;
     min-height: 100vh;
-    padding: 48px 20px 60px;
+    padding: 40px 20px 64px;
     background: var(--bg);
     color: var(--t1);
-    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  .caixa { max-width: 440px; margin: 0 auto; }
+  /* As faixas diagonais da referência. Ficam em pseudo-elementos para não
+     entrarem no fluxo nem atrapalharem o clique em nada. */
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        115deg,
+        var(--acc) 0 3px,
+        transparent 3px 26px
+      );
+    opacity: .5;
+  }
+
+  body::before {
+    top: -140px; right: -120px;
+    width: 460px; height: 420px;
+    mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+  }
+
+  body::after {
+    bottom: -160px; left: -140px;
+    width: 420px; height: 380px;
+    mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+  }
+
+  .caixa {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ── marca e título ──────────────────────────────────────────────────── */
 
   .marca {
+    margin: 0 0 34px;
+    font-size: 30px;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    color: var(--acc);
+    text-transform: uppercase;
+  }
+
+  .titulo {
     display: flex;
-    align-items: center;
-    gap: 9px;
-    margin-bottom: 22px;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 26px;
   }
 
-  .marca b {
-    display: grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
-    background: var(--acc);
-    color: #fff;
-    font-size: 13px;
+  .titulo .escudo { flex: none; margin-top: 2px; color: var(--acc); }
+
+  .titulo h1 {
+    margin: 0 0 6px;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
   }
 
-  .marca span { font-size: 13px; font-weight: 700; letter-spacing: -0.2px; }
+  .titulo h1 em { font-style: normal; color: var(--acc); }
 
-  h1 { margin: 0 0 22px; font-size: 20px; letter-spacing: -0.4px; }
+  .titulo p {
+    margin: 0;
+    max-width: 42ch;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--t2);
+  }
+
+  /* ── cartão ──────────────────────────────────────────────────────────── */
 
   .cartao {
-    padding: 20px;
+    padding: 26px 24px;
     border: 1px solid var(--linha);
-    border-radius: 14px;
-    background: var(--surface);
-    box-shadow: var(--sombra);
+    border-radius: 22px;
+    background: linear-gradient(180deg, #17181c 0%, #121316 100%);
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .9);
   }
 
-  label { display: block; margin-bottom: 14px; }
+  .grupo { margin-bottom: 22px; }
+  .grupo:last-of-type { margin-bottom: 0; }
 
-  label > span {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 11px;
+  .rotulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: var(--t1);
+  }
+
+  .rotulo svg { flex: none; color: var(--acc); }
+
+  .dica {
+    margin: -4px 0 10px 34px;
+    font-size: 12.5px;
     color: var(--t3);
   }
 
-  input {
-    width: 100%;
-    padding: 9px 11px;
+  /* ── campos ──────────────────────────────────────────────────────────── */
+
+  .campo {
+    display: flex;
+    align-items: stretch;
     border: 1px solid var(--linha);
-    border-radius: 9px;
-    background: var(--surface-2);
-    color: var(--t1);
-    font-family: inherit;
-    font-size: 14px;
+    border-radius: 14px;
+    background: var(--campo);
+    transition: border-color .15s, background .15s;
   }
 
-  input:focus { outline: 2px solid var(--acc); outline-offset: -1px; }
+  .campo:focus-within {
+    border-color: var(--acc);
+    background: var(--campo-2);
+  }
 
-  .so-rotulo, .so-rotulo > span { margin-bottom: 0; }
+  .campo-ico {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    flex: none;
+    border-right: 1px solid var(--linha);
+    color: var(--t3);
+  }
 
-  .dica { margin: 0 0 9px; font-size: 11.5px; color: var(--t3); }
+  .campo:focus-within .campo-ico { color: var(--acc); }
 
-  button {
-    padding: 10px 16px;
-    border: 1px solid var(--linha);
-    border-radius: 9px;
-    background: var(--surface-2);
+  .campo input {
+    flex: 1;
+    min-width: 0;
+    padding: 16px 16px;
+    border: 0;
+    background: none;
     color: var(--t1);
     font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .campo input:focus { outline: none; }
+  .campo input::placeholder { color: var(--t3); }
+
+  /* O ícone nativo do seletor de data é escuro sobre fundo escuro. */
+  .campo input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: .45;
     cursor: pointer;
   }
 
-  button:hover:not(:disabled) { border-color: var(--t3); }
-  button:disabled { opacity: .5; cursor: not-allowed; }
+  .campo input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: .8; }
 
-  button.primario { border-color: transparent; background: var(--acc); color: #fff; }
-  button.primario:hover:not(:disabled) { background: var(--acc-2); }
+  /* ── datas ───────────────────────────────────────────────────────────── */
 
-  .datas { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
+  .linha-data { display: flex; gap: 12px; }
+  .linha-data .campo { flex: 1; }
+
+  .btn-mais {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: none;
+    padding: 0 20px;
+    border: 1px solid var(--linha);
+    border-radius: 14px;
+    background: var(--campo);
+    color: var(--t1);
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+
+  .btn-mais:hover { border-color: var(--linha-2); background: var(--campo-2); }
+
+  .btn-mais i {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--acc);
+    color: #fff;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .chips:empty { display: none; }
 
   .chip {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 8px 5px 11px;
+    gap: 8px;
+    padding: 7px 8px 7px 14px;
+    border: 1px solid var(--acc-soft);
     border-radius: 999px;
-    background: var(--surface-2);
-    font-size: 12.5px;
+    background: var(--acc-soft);
+    font-size: 13.5px;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
+    color: var(--t1);
   }
 
   .chip button {
-    padding: 0 3px;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
     border: 0;
-    background: none;
-    color: var(--t3);
-    font-size: 15px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .08);
+    color: var(--t2);
+    font-family: inherit;
+    font-size: 14px;
     line-height: 1;
+    cursor: pointer;
   }
 
-  .linha-data { display: flex; gap: 8px; }
-  .linha-data input { flex: 1; }
+  .chip button:hover { background: var(--acc); color: #fff; }
+
+  /* ── envio ───────────────────────────────────────────────────────────── */
 
   .pe {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin-top: 20px;
-    padding-top: 16px;
+    margin-top: 26px;
+    padding-top: 22px;
     border-top: 1px solid var(--linha);
   }
 
+  .btn-enviar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 17px 20px;
+    border: 0;
+    border-radius: 14px;
+    background: linear-gradient(90deg, var(--acc) 0%, #ff6a1f 100%);
+    color: #fff;
+    font-family: inherit;
+    font-size: 15.5px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow: 0 12px 26px -12px rgba(255, 77, 10, .8);
+    transition: filter .15s, box-shadow .15s;
+  }
+
+  .btn-enviar:hover:not(:disabled) { filter: brightness(1.08); }
+
+  .btn-enviar:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-enviar .seta { transition: transform .15s; }
+  .btn-enviar:hover:not(:disabled) .seta { transform: translateX(3px); }
+
+  /* ── recados ─────────────────────────────────────────────────────────── */
+
   .recado {
-    margin: 0 0 14px;
-    padding: 10px 12px;
-    border-radius: 9px;
-    font-size: 12.5px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 13px 15px;
+    border-radius: 12px;
+    font-size: 13.5px;
     line-height: 1.5;
   }
 
-  .recado.erro { background: var(--vermelho-soft); color: var(--vermelho); }
+  .recado.erro {
+    border: 1px solid rgba(255, 84, 112, .25);
+    background: var(--vermelho-soft);
+    color: var(--vermelho);
+  }
 
   .oculto { display: none !important; }
 
-  .fim { text-align: center; padding: 12px 0 4px; }
-  .fim p { margin: 0 0 18px; font-size: 14px; color: var(--t2); }
+  /* ── confirmação ─────────────────────────────────────────────────────── */
+
+  .fim { text-align: center; padding: 14px 4px 6px; }
+
+  .fim .visto {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: rgba(62, 207, 152, .12);
+    color: var(--verde);
+  }
+
+  .fim p {
+    margin: 0 0 22px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--t2);
+  }
+
   .fim strong { color: var(--t1); }
+
+  .btn-outro {
+    padding: 13px 22px;
+    border: 1px solid var(--linha-2);
+    border-radius: 12px;
+    background: var(--campo);
+    color: var(--t1);
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .btn-outro:hover { background: var(--campo-2); }
+
+  @media (max-width: 520px) {
+    .titulo h1 { font-size: 27px; }
+    .marca { font-size: 25px; }
+    .cartao { padding: 22px 18px; }
+    .linha-data { flex-wrap: wrap; }
+    .btn-mais { width: 100%; justify-content: center; }
+  }
 </style>
 </head>
 <body>
 
 <div class="caixa">
-  <div class="marca"><b>E</b><span>Esportiva Bet</span></div>
+  <div class="marca">Esportivabet</div>
 
-  <h1>Bingos Protegidos</h1>
+  <div class="titulo">
+    <svg class="escudo" width="46" height="46" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 2.5 4.5 5.5v6c0 4.6 3.1 8.6 7.5 10 4.4-1.4 7.5-5.4 7.5-10v-6L12 2.5Z" />
+      <rect x="9.2" y="10.6" width="5.6" height="4.6" rx="1.1" />
+      <path d="M10.4 10.6V9.4a1.6 1.6 0 0 1 3.2 0v1.2" />
+    </svg>
+
+    <div>
+      <h1>Bingos <em>Protegidos</em></h1>
+      <p>Cadastre os detalhes do seu bilhete para garantir a proteção do seu bingo.</p>
+    </div>
+  </div>
+
   <form class="cartao" id="form">
-    <label>
-      <span>Nome do tipster</span>
-      <input type="text" id="tipster" autocomplete="off" required />
-    </label>
-
-    <label>
-      <span>Stake do bilhete (R$)</span>
-      <input type="number" id="stake" min="0.01" step="0.01" required />
-    </label>
-
-    <label>
-      <span>Link do bilhete</span>
-      <input type="url" id="link" placeholder="https://…" required />
-    </label>
-
-    <label class="so-rotulo"><span>Datas dos confrontos</span></label>
-    <p class="dica">A data que os confrontos ocorreram</p>
-    <div class="datas" id="chips"></div>
-    <div class="linha-data">
-      <input type="date" id="data" />
-      <button type="button" id="btn-data">Acrescentar</button>
+    <div class="grupo">
+      <div class="rotulo">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.6" />
+          <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
+        </svg>
+        Nome do tipster
+      </div>
+      <div class="campo">
+        <span class="campo-ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.6" />
+            <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
+          </svg>
+        </span>
+        <input type="text" id="tipster" placeholder="Digite o nome do tipster" autocomplete="off" required />
+      </div>
     </div>
 
-    <p class="recado erro oculto" id="erro"></p>
+    <div class="grupo">
+      <div class="rotulo">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <ellipse cx="12" cy="6.5" rx="7" ry="3" />
+          <path d="M5 6.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5" />
+          <path d="M5 11.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5" />
+        </svg>
+        Stake do bilhete (R$)
+      </div>
+      <div class="campo">
+        <span class="campo-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <text x="12" y="15.6" text-anchor="middle" font-size="8.5" font-family="inherit"
+                  font-weight="700" fill="currentColor" stroke="none">R$</text>
+          </svg>
+        </span>
+        <input type="number" id="stake" min="0.01" step="0.01" placeholder="Digite o valor da stake" required />
+      </div>
+    </div>
+
+    <div class="grupo">
+      <div class="rotulo">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.2 1.2" />
+          <path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.2-1.2" />
+        </svg>
+        Link do bilhete
+      </div>
+      <div class="campo">
+        <span class="campo-ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.2 1.2" />
+            <path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.2-1.2" />
+          </svg>
+        </span>
+        <input type="url" id="link" placeholder="https://..." required />
+      </div>
+    </div>
+
+    <div class="grupo">
+      <div class="rotulo">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+          <path d="M3.5 9.8h17M8 3.5v3M16 3.5v3" />
+        </svg>
+        Datas dos confrontos
+      </div>
+      <p class="dica">A data que os confrontos ocorreram</p>
+
+      <div class="chips" id="chips"></div>
+
+      <div class="linha-data">
+        <div class="campo">
+          <span class="campo-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+              <path d="M3.5 9.8h17M8 3.5v3M16 3.5v3" />
+            </svg>
+          </span>
+          <input type="date" id="data" />
+        </div>
+
+        <button type="button" class="btn-mais" id="btn-data">
+          <i>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="3" stroke-linecap="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </i>
+          Acrescentar
+        </button>
+      </div>
+    </div>
 
     <div class="pe">
-      <button type="submit" class="primario" id="btn-salvar">Cadastrar bilhete</button>
+      <p class="recado erro oculto" id="erro"></p>
+
+      <button type="submit" class="btn-enviar" id="btn-salvar">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 3.5H7.5A2.5 2.5 0 0 0 5 6v12a2.5 2.5 0 0 0 2.5 2.5h9A2.5 2.5 0 0 0 19 18V8.5L14 3.5Z" />
+          <path d="M13.8 3.7V9h5.1M12 12.2v5M9.5 14.7h5" />
+        </svg>
+        <span id="rotulo-salvar">Cadastrar bilhete</span>
+        <svg class="seta" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h13M12.5 5.5 19 12l-6.5 6.5" />
+        </svg>
+      </button>
     </div>
   </form>
 
   <div class="cartao oculto" id="pronto">
     <div class="fim">
+      <div class="visto">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12.5 10 17.5 19 7" />
+        </svg>
+      </div>
       <p>Bilhete cadastrado. Ele entra na fila do BI quando <strong id="quando"></strong>.</p>
-      <button type="button" class="primario" id="btn-outro">Cadastrar outro</button>
+      <button type="button" class="btn-outro" id="btn-outro">Cadastrar outro</button>
     </div>
   </div>
 </div>
@@ -255,7 +571,7 @@ function desenharChips() {
   for (const d of datas) {
     const chip = document.createElement('span')
     chip.className = 'chip'
-    chip.textContent = formatar(d)
+    chip.append(formatar(d))
 
     const x = document.createElement('button')
     x.type = 'button'
@@ -289,8 +605,9 @@ form.onsubmit = async (e) => {
   }
 
   const btn = $('btn-salvar')
+  const rotulo = $('rotulo-salvar')
   btn.disabled = true
-  btn.textContent = 'Cadastrando…'
+  rotulo.textContent = 'Cadastrando…'
 
   try {
     const res = await fetch('/api/registrar', {
@@ -313,7 +630,7 @@ form.onsubmit = async (e) => {
     recado($('erro'), err.message)
   } finally {
     btn.disabled = false
-    btn.textContent = 'Cadastrar bilhete'
+    rotulo.textContent = 'Cadastrar bilhete'
   }
 }
 
