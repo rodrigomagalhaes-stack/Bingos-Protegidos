@@ -57,10 +57,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .caixa {
-    max-width: 560px;
-    margin: 0 auto;
-  }
+  .caixa { max-width: 560px; margin: 0 auto; }
 
   .marca {
     display: flex;
@@ -111,7 +108,7 @@
     color: var(--t3);
   }
 
-  input, select, textarea {
+  input, textarea {
     width: 100%;
     padding: 9px 11px;
     border: 1px solid var(--linha);
@@ -122,10 +119,7 @@
     font-size: 14px;
   }
 
-  input:focus, select:focus, textarea:focus {
-    outline: 2px solid var(--acc);
-    outline-offset: -1px;
-  }
+  input:focus, textarea:focus { outline: 2px solid var(--acc); outline-offset: -1px; }
 
   textarea { min-height: 68px; resize: vertical; }
 
@@ -146,12 +140,7 @@
   button:hover:not(:disabled) { border-color: var(--t3); }
   button:disabled { opacity: .5; cursor: not-allowed; }
 
-  button.primario {
-    border-color: transparent;
-    background: var(--acc);
-    color: #fff;
-  }
-
+  button.primario { border-color: transparent; background: var(--acc); color: #fff; }
   button.primario:hover:not(:disabled) { background: var(--acc-2); }
 
   .datas { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
@@ -182,8 +171,7 @@
   .pe {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    justify-content: flex-end;
     margin-top: 20px;
     padding-top: 16px;
     border-top: 1px solid var(--linha);
@@ -198,7 +186,6 @@
   }
 
   .recado.erro { background: var(--vermelho-soft); color: var(--vermelho); }
-  .recado.ok { background: var(--verde-soft); color: var(--verde); }
 
   .oculto { display: none !important; }
 
@@ -218,28 +205,14 @@
     terminar, ele aparece no BI na fila de reembolso.
   </p>
 
-  <!-- ── portão ────────────────────────────────────────────────────────── -->
-  <form class="cartao" id="portao">
+  <form class="cartao" id="form">
     <label>
-      <span>Código de acesso</span>
-      <input type="password" id="codigo" autocomplete="current-password" required />
-    </label>
-    <p class="dica">O código é da equipe. Se não tiver, peça a quem cuida do BI.</p>
-    <p class="recado erro oculto" id="erro-codigo"></p>
-    <button type="submit" class="primario" id="btn-entrar">Entrar</button>
-  </form>
-
-  <!-- ── formulário ────────────────────────────────────────────────────── -->
-  <form class="cartao oculto" id="form">
-    <label>
-      <span>Tipster</span>
-      <select id="tipster" required>
-        <option value="">escolha…</option>
-      </select>
+      <span>Nome do tipster</span>
+      <input type="text" id="tipster" autocomplete="off" required />
     </label>
     <p class="dica">
-      A lista vem do cadastro no BI. Se faltar alguém, cadastre lá primeiro — nome
-      digitado à mão quebraria os relatórios depois.
+      Escreva sempre do mesmo jeito. O BI agrupa os bilhetes por este nome, e uma
+      grafia diferente vira outro tipster nos totais.
     </p>
 
     <label>
@@ -252,9 +225,7 @@
       <input type="url" id="link" placeholder="https://…" required />
     </label>
 
-    <label>
-      <span>Datas dos confrontos</span>
-    </label>
+    <label><span>Datas dos confrontos</span></label>
     <div class="datas" id="chips"></div>
     <div class="linha-data">
       <input type="date" id="data" />
@@ -266,7 +237,7 @@
 
     <label>
       <span>Quem está cadastrando</span>
-      <input type="text" id="quem" placeholder="seu nome" />
+      <input type="text" id="quem" placeholder="seu nome" autocomplete="off" />
     </label>
 
     <label>
@@ -277,12 +248,10 @@
     <p class="recado erro oculto" id="erro"></p>
 
     <div class="pe">
-      <button type="button" id="btn-sair">trocar código</button>
       <button type="submit" class="primario" id="btn-salvar">Cadastrar bilhete</button>
     </div>
   </form>
 
-  <!-- ── fim ───────────────────────────────────────────────────────────── -->
   <div class="cartao oculto" id="pronto">
     <div class="fim">
       <p>Bilhete cadastrado. Ele entra na fila do BI quando <strong id="quando"></strong>.</p>
@@ -292,13 +261,7 @@
 </div>
 
 <script>
-// O código fica em sessionStorage, e não em localStorage: some quando a aba
-// fecha. Numa máquina compartilhada da operação, um segredo de equipe que
-// sobrevive ao fim do expediente é um segredo a mais espalhado por aí.
-const GUARDA = 'protegidos:codigo'
-
 const $ = (id) => document.getElementById(id)
-const portao = $('portao')
 const form = $('form')
 const pronto = $('pronto')
 
@@ -336,54 +299,6 @@ function desenharChips() {
   }
 }
 
-async function chamar(caminho, opcoes = {}) {
-  const res = await fetch(caminho, {
-    ...opcoes,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Codigo': sessionStorage.getItem(GUARDA) ?? '',
-      ...(opcoes.headers ?? {}),
-    },
-  })
-  const dados = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(dados.erro || 'Deu erro aqui. Tente de novo.')
-  return dados
-}
-
-async function carregarTipsters() {
-  const { tipsters } = await chamar('/api/tipsters')
-  const select = $('tipster')
-  select.innerHTML = '<option value="">escolha…</option>'
-  for (const t of tipsters) {
-    const op = document.createElement('option')
-    op.value = t.id
-    op.textContent = t.nome
-    select.appendChild(op)
-  }
-  if (!tipsters.length) {
-    recado($('erro'), 'Nenhum tipster ativo cadastrado no BI ainda.')
-  }
-}
-
-portao.onsubmit = async (e) => {
-  e.preventDefault()
-  const btn = $('btn-entrar')
-  btn.disabled = true
-  recado($('erro-codigo'), '')
-  sessionStorage.setItem(GUARDA, $('codigo').value)
-
-  try {
-    await carregarTipsters()
-    esconder(portao)
-    mostrar(form)
-  } catch (err) {
-    sessionStorage.removeItem(GUARDA)
-    recado($('erro-codigo'), err.message)
-  } finally {
-    btn.disabled = false
-  }
-}
-
 $('btn-data').onclick = () => {
   const v = $('data').value
   if (!v) return
@@ -391,11 +306,6 @@ $('btn-data').onclick = () => {
   datas.sort()
   $('data').value = ''
   desenharChips()
-}
-
-$('btn-sair').onclick = () => {
-  sessionStorage.removeItem(GUARDA)
-  location.reload()
 }
 
 form.onsubmit = async (e) => {
@@ -411,11 +321,11 @@ form.onsubmit = async (e) => {
   btn.textContent = 'Cadastrando…'
 
   try {
-    await chamar('/api/registrar', {
+    const res = await fetch('/api/registrar', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        codigo: sessionStorage.getItem(GUARDA),
-        tipster_id: $('tipster').value,
+        tipster_nome: $('tipster').value,
         stake: Number($('stake').value),
         link_bilhete: $('link').value,
         datas_confrontos: datas,
@@ -423,6 +333,8 @@ form.onsubmit = async (e) => {
         observacao: $('obs').value,
       }),
     })
+    const dados = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(dados.erro || 'Deu erro aqui. Tente de novo.')
 
     $('quando').textContent = 'o jogo de ' + formatar(datas[datas.length - 1]) + ' terminar'
     esconder(form)
@@ -436,9 +348,12 @@ form.onsubmit = async (e) => {
 }
 
 $('btn-outro').onclick = () => {
-  // Guarda quem está cadastrando: é a mesma pessoa nos dez bilhetes seguidos.
+  // Guarda o tipster e quem está cadastrando: são os mesmos nos dez bilhetes
+  // seguidos, e redigitar o nome a cada um é onde a grafia começa a variar.
+  const tipster = $('tipster').value
   const quem = $('quem').value
   form.reset()
+  $('tipster').value = tipster
   $('quem').value = quem
   datas = []
   desenharChips()

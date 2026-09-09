@@ -1,4 +1,3 @@
-import { liberado } from './_acesso.js'
 import { rest } from './_supabase.js'
 
 // O cadastro de um bilhete protegido.
@@ -8,8 +7,13 @@ import { rest } from './_supabase.js'
 // entra aqui vira obrigação de pagamento do outro lado. A validação do
 // navegador serve para a pessoa não errar; esta serve para o sistema não ser
 // enganado.
+//
+// O endereço é aberto: não há código de acesso. A trava que sobra contra
+// cadastro repetido é o índice único do link, no banco — e é justamente a que
+// não pode falhar, porque cadastrar duas vezes é reembolsar duas vezes.
 
 const LIMITE_DATAS = 20
+const LIMITE_TEXTO = 120
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -17,31 +21,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ erro: 'Método não permitido.' })
   }
 
-  if (!liberado(req, res)) return
-
-  const { tipster_id, stake, link_bilhete, datas_confrontos, observacao, enviado_por } =
+  const { tipster_nome, stake, link_bilhete, datas_confrontos, observacao, enviado_por } =
     req.body ?? {}
 
-  const erro = validar({ tipster_id, stake, link_bilhete, datas_confrontos })
+  const erro = validar({ tipster_nome, stake, link_bilhete, datas_confrontos })
   if (erro) return res.status(400).json({ erro })
 
   try {
-    // O nome do tipster é carimbado no bilhete, e sai daqui — não do que o
-    // navegador mandou. Aceitar o nome enviado deixaria o bilhete de "João"
-    // gravado com o nome de outra pessoa por um campo escondido trocado.
-    const [tipster] = await rest(
-      `protegidos_tipsters?select=id,nome,ativo&id=eq.${encodeURIComponent(tipster_id)}`,
-    )
-
-    if (!tipster) return res.status(400).json({ erro: 'Tipster não encontrado.' })
-    if (!tipster.ativo) return res.status(400).json({ erro: 'Esse tipster está desativado.' })
-
     const [bilhete] = await rest('protegidos_bilhetes', {
       method: 'POST',
       headers: { Prefer: 'return=representation' },
       body: {
-        tipster_id: tipster.id,
-        tipster_nome: tipster.nome,
+        // Espaço sobrando some aqui: o BI agrupa por este nome, e "João " e
+        // "João" seriam dois tipsters em toda soma. O resto da normalização
+        // (caixa, espaço no meio) é coluna gerada no banco.
+        tipster_nome: String(tipster_nome).trim().replace(/\s+/g, ' '),
         stake: Number(stake),
         link_bilhete: String(link_bilhete).trim(),
         datas_confrontos,
@@ -54,8 +48,7 @@ export default async function handler(req, res) {
   } catch (e) {
     // 23505 é violação de índice único, e aqui só existe um: o do link. O
     // duplicado é o erro mais provável deste formulário (o mesmo bilhete
-    // chegando por dois caminhos), e é justamente o que não pode passar —
-    // cadastrar duas vezes é reembolsar duas vezes.
+    // chegando por dois caminhos), e é o que não pode passar.
     if (e.detalhe?.code === '23505') {
       return res.status(409).json({
         erro: 'Este bilhete já foi cadastrado. Confira no BI antes de cadastrar de novo.',
@@ -71,8 +64,10 @@ export default async function handler(req, res) {
   }
 }
 
-function validar({ tipster_id, stake, link_bilhete, datas_confrontos }) {
-  if (!tipster_id || typeof tipster_id !== 'string') return 'Escolha o tipster.'
+function validar({ tipster_nome, stake, link_bilhete, datas_confrontos }) {
+  const nome = String(tipster_nome ?? '').trim()
+  if (!nome) return 'Escreva o nome do tipster.'
+  if (nome.length > LIMITE_TEXTO) return 'O nome do tipster está longo demais.'
 
   const valor = Number(stake)
   if (!Number.isFinite(valor) || valor <= 0) return 'A stake precisa ser um número maior que zero.'
