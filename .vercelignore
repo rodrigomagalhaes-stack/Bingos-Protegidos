@@ -1,0 +1,16 @@
+# O diretório de saída deste projeto é a raiz: tudo que sobe fica servido como
+# arquivo estático. Então sobe só o que a página precisa.
+#
+# O `.env` é o caso que importa — ele tem a chave de serviço. Ele já está no
+# .gitignore, mas um `vercel deploy` feito da pasta envia o que está no disco,
+# e não o que está no git.
+
+.env
+.env.*
+.git/
+node_modules/
+
+# Só para desenvolvimento: na Vercel quem serve o index.html é ela, e cada
+# arquivo de api/ vira uma função sozinha.
+servidor.js
+README.md
