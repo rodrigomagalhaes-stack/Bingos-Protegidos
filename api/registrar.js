@@ -55,6 +55,16 @@ export default async function handler(req, res) {
       })
     }
 
+    // Deploy antigo, publicado antes de as variáveis existirem. Cada deploy
+    // da Vercel guarda um endereço próprio para sempre, então um link velho
+    // continua respondendo — e sem chave ele nunca vai gravar. Dizer "tente
+    // de novo" aqui manda a pessoa repetir uma coisa que não pode dar certo.
+    if (e.configuracao) {
+      return res.status(500).json({
+        erro: 'Este endereço está sem configuração — provavelmente é o link de um deploy antigo. Use https://bingos-protegidos.vercel.app',
+      })
+    }
+
     if (e.detalhe?.code === '23514') {
       return res.status(400).json({ erro: 'Algum campo veio fora do formato esperado.' })
     }

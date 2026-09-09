@@ -13,7 +13,13 @@ const CHAVE = process.env.SUPABASE_SERVICE_ROLE_KEY
 export const configurado = Boolean(URL && CHAVE)
 
 export async function rest(caminho, { method = 'GET', body, headers = {} } = {}) {
-  if (!configurado) throw new Error('SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não configuradas.')
+  if (!configurado) {
+    // Marcado para quem chama poder dizer a verdade a quem está na tela:
+    // isto não é falha passageira, e tentar de novo nunca vai resolver.
+    const erro = new Error('SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não configuradas.')
+    erro.configuracao = true
+    throw erro
+  }
 
   const res = await fetch(`${URL}/rest/v1/${caminho}`, {
     method,
