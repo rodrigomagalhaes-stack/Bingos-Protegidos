@@ -76,6 +76,12 @@ async function lerCorpo(req) {
   }
 }
 
+// O que este servidor entrega, e nada além disso.
+const PUBLICOS = new Map([
+  ['/', 'index.html'],
+  ['/index.html', 'index.html'],
+])
+
 const TIPOS = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -117,10 +123,24 @@ createServer(async (req, res) => {
     return
   }
 
-  const caminho = url.pathname === '/' ? '/index.html' : url.pathname
-  const arquivo = resolve(RAIZ, caminho.replace(/^\//, ''))
+  // Lista fechada, e não "qualquer arquivo dentro da pasta".
+  //
+  // A versão anterior resolvia o caminho pedido e só conferia se ele caía
+  // dentro da raiz do projeto. `/api/../.env` passava: `new URL()` normaliza o
+  // `..` ANTES desta função ver o caminho, então ele chegava aqui como `/.env`,
+  // escapava do ramo de `/api/` e caía neste — e o `.env`, com a chave de
+  // serviço dentro, está dentro da raiz. O servidor entregava a chave a
+  // qualquer coisa que alcançasse esta porta.
+  //
+  // O front inteiro é um arquivo só, então a lista fechada não custa nada e
+  // fecha a classe de problema, não só aquele caminho.
+  if (!PUBLICOS.has(url.pathname)) {
+    res.statusCode = 404
+    return res.end('não encontrado')
+  }
 
-  if (!arquivo.startsWith(RAIZ) || !existsSync(arquivo)) {
+  const arquivo = resolve(RAIZ, PUBLICOS.get(url.pathname))
+  if (!existsSync(arquivo)) {
     res.statusCode = 404
     return res.end('não encontrado')
   }
