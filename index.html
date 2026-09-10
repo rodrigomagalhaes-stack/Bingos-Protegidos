@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
-<title>Cadastro de Bingos Protegidos</title>
+<title>Bingos Protegidos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
@@ -31,6 +31,7 @@
     --acc-soft: rgba(255, 77, 10, .12);
 
     --verde: #3ecf98;
+    --verde-soft: rgba(62, 207, 152, .12);
     --vermelho: #ff5470;
     --vermelho-soft: rgba(255, 84, 112, .12);
 
@@ -120,6 +121,71 @@
   }
 
   .titulo h1 em { font-style: normal; color: var(--acc); }
+
+  .carregando {
+    margin: 30px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--t3);
+  }
+
+  /* ── conta e abas ────────────────────────────────────────────────────── */
+
+  .conta-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--t2);
+  }
+
+  .conta-barra strong { color: var(--t1); }
+
+  .link-sutil {
+    padding: 6px 2px;
+    border: 0;
+    background: none;
+    color: var(--t3);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .link-sutil:hover { color: var(--acc-2); }
+
+  .abas {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    padding: 4px;
+    border: 1px solid var(--linha);
+    border-radius: 14px;
+    background: var(--card);
+  }
+
+  .aba {
+    flex: 1;
+    padding: 11px 10px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--t2);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+
+  .aba:hover { color: var(--t1); }
+
+  .aba.ativa {
+    background: var(--acc-soft);
+    color: var(--acc-2);
+  }
 
   /* ── cartão ──────────────────────────────────────────────────────────── */
 
@@ -318,7 +384,7 @@
     height: 52px;
     margin: 0 auto 18px;
     border-radius: 50%;
-    background: rgba(62, 207, 152, .12);
+    background: var(--verde-soft);
     color: var(--verde);
   }
 
@@ -330,6 +396,13 @@
   }
 
   .fim strong { color: var(--t1); }
+
+  .fim-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
 
   .btn-outro {
     padding: 13px 22px;
@@ -345,10 +418,163 @@
 
   .btn-outro:hover { background: var(--campo-2); }
 
+  /* ── minhas solicitações ─────────────────────────────────────────────── */
+
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .filtro {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border: 1px solid var(--linha-2);
+    border-radius: 999px;
+    background: var(--campo);
+    color: var(--t2);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .filtro:hover { color: var(--t1); }
+  .filtro.ativo { border-color: var(--acc); color: var(--t1); }
+
+  .filtro-num {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--t3);
+  }
+
+  .lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .vazio {
+    margin: 0;
+    padding: 34px 14px;
+    border: 1px dashed var(--linha-2);
+    border-radius: 16px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--t3);
+  }
+
+  /* A faixa lateral repete a cor da etiqueta: rolando uma lista longa, é ela
+     que se lê de relance, antes de qualquer texto. */
+  .item {
+    padding: 16px 18px;
+    border: 1px solid var(--linha);
+    border-left: 3px solid var(--linha-2);
+    border-radius: 16px;
+    background: var(--card);
+  }
+
+  .item-aprovado { border-left-color: var(--acc); }
+  .item-recusado { border-left-color: var(--vermelho); }
+  .item-pago { border-left-color: var(--verde); }
+
+  .item-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .item-valor {
+    font-size: 17px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tag {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .tag-analise { background: rgba(255, 255, 255, .07); color: var(--t2); }
+  .tag-aprovado { background: var(--acc-soft); color: var(--acc-2); }
+  .tag-recusado { background: var(--vermelho-soft); color: var(--vermelho); }
+  .tag-pago { background: var(--verde-soft); color: var(--verde); }
+
+  .item-linha {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 14px;
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+    color: var(--t2);
+  }
+
+  .item-link {
+    color: var(--acc-2);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .item-link:hover { text-decoration: underline; }
+
+  .item-quando {
+    margin: 8px 0 0;
+    font-size: 12.5px;
+    color: var(--t3);
+  }
+
+  .item-dica {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--t2);
+  }
+
+  .motivo {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 84, 112, .25);
+    border-radius: 12px;
+    background: var(--vermelho-soft);
+  }
+
+  .motivo-rotulo {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--vermelho);
+  }
+
+  .motivo p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--t1);
+  }
+
+  .motivo .motivo-dica {
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--t2);
+  }
+
   @media (max-width: 520px) {
     .titulo h1 { font-size: 27px; }
     .marca { font-size: 25px; }
     .cartao { padding: 22px 18px; }
+    .aba { font-size: 13px; }
   }
 </style>
 </head>
@@ -370,135 +596,228 @@
     </div>
   </div>
 
-  <form class="cartao" id="form">
-    <div class="grupo">
-      <div class="rotulo">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="8" r="3.6" />
-          <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
-        </svg>
-        Nome do tipster
-      </div>
-      <div class="campo">
-        <span class="campo-ico">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <p class="carregando" id="carregando">Carregando…</p>
+
+  <!-- ── entrar ou criar conta ─────────────────────────────────────────── -->
+
+  <section class="oculto" id="tela-entrar">
+    <div class="abas">
+      <button type="button" class="aba ativa" data-modo="entrar">Entrar</button>
+      <button type="button" class="aba" data-modo="criar">Criar conta</button>
+    </div>
+
+    <form class="cartao" id="form-conta">
+      <div class="grupo oculto" id="grupo-nome">
+        <div class="rotulo">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="8" r="3.6" />
             <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
           </svg>
-        </span>
-        <input type="text" id="tipster" placeholder="Digite o nome do tipster" autocomplete="off" required />
+          Nome de tipster
+        </div>
+        <p class="dica">É o nome que a equipe vê em cada bilhete seu</p>
+        <div class="campo">
+          <span class="campo-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.6" />
+              <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
+            </svg>
+          </span>
+          <input type="text" id="conta-nome" placeholder="Como você é conhecido" autocomplete="nickname" maxlength="120" />
+        </div>
       </div>
-    </div>
 
-    <div class="grupo">
-      <div class="rotulo">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <ellipse cx="12" cy="6.5" rx="7" ry="3" />
-          <path d="M5 6.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5" />
-          <path d="M5 11.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5" />
-        </svg>
-        Stake do bilhete (R$)
-      </div>
-      <div class="campo">
-        <span class="campo-ico">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" />
-            <text x="12" y="15.6" text-anchor="middle" font-size="8.5" font-family="inherit"
-                  font-weight="700" fill="currentColor" stroke="none">R$</text>
+      <div class="grupo">
+        <div class="rotulo">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="14" rx="2.5" />
+            <path d="m3.8 7.2 8.2 6 8.2-6" />
           </svg>
-        </span>
-        <input type="number" id="stake" min="0.01" step="0.01" placeholder="Digite o valor da stake" required />
+          E-mail
+        </div>
+        <div class="campo">
+          <span class="campo-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="2.5" />
+              <path d="m3.8 7.2 8.2 6 8.2-6" />
+            </svg>
+          </span>
+          <input type="email" id="conta-email" placeholder="voce@email.com" autocomplete="email" required />
+        </div>
       </div>
-    </div>
 
-    <div class="grupo">
-      <div class="rotulo">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.2 1.2" />
-          <path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.2-1.2" />
-        </svg>
-        Link do bilhete
-      </div>
-      <div class="campo">
-        <span class="campo-ico">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.2 1.2" />
-            <path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.2-1.2" />
+      <div class="grupo">
+        <div class="rotulo">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" />
+            <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
           </svg>
-        </span>
-        <input type="url" id="link" placeholder="https://..." required />
+          Senha
+        </div>
+        <p class="dica oculto" id="dica-senha">Pelo menos 8 caracteres</p>
+        <div class="campo">
+          <span class="campo-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" />
+              <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+            </svg>
+          </span>
+          <input type="password" id="conta-senha" placeholder="Sua senha" autocomplete="current-password" required />
+        </div>
       </div>
-    </div>
 
-    <div class="grupo">
-      <div class="rotulo">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
-          <path d="M3.5 9.8h17M8 3.5v3M16 3.5v3" />
-        </svg>
-        Datas dos confrontos
-      </div>
-      <p class="dica">A data que os confrontos ocorreram</p>
+      <div class="pe">
+        <p class="recado erro oculto" id="erro-conta"></p>
 
-      <div class="chips" id="chips"></div>
-
-      <div class="campo">
-        <span class="campo-ico">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
-            <path d="M3.5 9.8h17M8 3.5v3M16 3.5v3" />
+        <button type="submit" class="btn-enviar" id="btn-conta">
+          <span id="rotulo-conta">Entrar</span>
+          <svg class="seta" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h13M12.5 5.5 19 12l-6.5 6.5" />
           </svg>
-        </span>
-        <input type="date" id="data" />
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ── logado ────────────────────────────────────────────────────────── -->
+
+  <section class="oculto" id="tela-app">
+    <div class="conta-barra">
+      <span>Olá, <strong id="nome-conta"></strong></span>
+      <button type="button" class="link-sutil" id="btn-sair">Sair</button>
+    </div>
+
+    <div class="abas">
+      <button type="button" class="aba ativa" data-vista="nova">Nova solicitação</button>
+      <button type="button" class="aba" data-vista="minhas">Minhas solicitações</button>
+    </div>
+
+    <div id="vista-nova">
+      <form class="cartao" id="form">
+        <div class="grupo">
+          <div class="rotulo">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <ellipse cx="12" cy="6.5" rx="7" ry="3" />
+              <path d="M5 6.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5" />
+              <path d="M5 11.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5" />
+            </svg>
+            Stake do bilhete (R$)
+          </div>
+          <div class="campo">
+            <span class="campo-ico">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <text x="12" y="15.6" text-anchor="middle" font-size="8.5" font-family="inherit"
+                      font-weight="700" fill="currentColor" stroke="none">R$</text>
+              </svg>
+            </span>
+            <input type="number" id="stake" min="0.01" step="0.01" placeholder="Digite o valor da stake" required />
+          </div>
+        </div>
+
+        <div class="grupo">
+          <div class="rotulo">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.2 1.2" />
+              <path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.2-1.2" />
+            </svg>
+            Link do bilhete
+          </div>
+          <div class="campo">
+            <span class="campo-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.2 1.2" />
+                <path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.2-1.2" />
+              </svg>
+            </span>
+            <input type="url" id="link" placeholder="https://..." required />
+          </div>
+        </div>
+
+        <div class="grupo">
+          <div class="rotulo">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+              <path d="M3.5 9.8h17M8 3.5v3M16 3.5v3" />
+            </svg>
+            Datas dos confrontos
+          </div>
+          <p class="dica">A data que os confrontos ocorreram</p>
+
+          <div class="chips" id="chips"></div>
+
+          <div class="campo">
+            <span class="campo-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+                <path d="M3.5 9.8h17M8 3.5v3M16 3.5v3" />
+              </svg>
+            </span>
+            <input type="date" id="data" />
+          </div>
+        </div>
+
+        <div class="pe">
+          <p class="recado erro oculto" id="erro"></p>
+
+          <button type="submit" class="btn-enviar" id="btn-salvar">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 3.5H7.5A2.5 2.5 0 0 0 5 6v12a2.5 2.5 0 0 0 2.5 2.5h9A2.5 2.5 0 0 0 19 18V8.5L14 3.5Z" />
+              <path d="M13.8 3.7V9h5.1M12 12.2v5M9.5 14.7h5" />
+            </svg>
+            <span id="rotulo-salvar">Enviar solicitação</span>
+            <svg class="seta" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h13M12.5 5.5 19 12l-6.5 6.5" />
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      <div class="cartao oculto" id="pronto">
+        <div class="fim">
+          <div class="visto">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12.5 10 17.5 19 7" />
+            </svg>
+          </div>
+          <p>
+            Solicitação enviada. Ela fica <strong>Em análise</strong> em Minhas solicitações
+            até a equipe responder.
+          </p>
+          <div class="fim-acoes">
+            <button type="button" class="btn-outro" id="btn-outro">Enviar outra</button>
+            <button type="button" class="btn-outro" id="btn-ver">Ver minhas solicitações</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="pe">
-      <p class="recado erro oculto" id="erro"></p>
-
-      <button type="submit" class="btn-enviar" id="btn-salvar">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M14 3.5H7.5A2.5 2.5 0 0 0 5 6v12a2.5 2.5 0 0 0 2.5 2.5h9A2.5 2.5 0 0 0 19 18V8.5L14 3.5Z" />
-          <path d="M13.8 3.7V9h5.1M12 12.2v5M9.5 14.7h5" />
-        </svg>
-        <span id="rotulo-salvar">Cadastrar bilhete</span>
-        <svg class="seta" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12h13M12.5 5.5 19 12l-6.5 6.5" />
-        </svg>
-      </button>
+    <div class="oculto" id="vista-minhas">
+      <div class="filtros" id="filtros"></div>
+      <p class="recado erro oculto" id="erro-lista"></p>
+      <div class="lista" id="lista"></div>
     </div>
-  </form>
-
-  <div class="cartao oculto" id="pronto">
-    <div class="fim">
-      <div class="visto">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12.5 10 17.5 19 7" />
-        </svg>
-      </div>
-      <p>Bilhete cadastrado. Ele entra na fila do BI quando <strong id="quando"></strong>.</p>
-      <button type="button" class="btn-outro" id="btn-outro">Cadastrar outro</button>
-    </div>
-  </div>
+  </section>
 </div>
 
 <script>
 const $ = (id) => document.getElementById(id)
-const form = $('form')
-const pronto = $('pronto')
-
-let datas = []
 
 const mostrar = (el) => el.classList.remove('oculto')
 const esconder = (el) => el.classList.add('oculto')
@@ -509,7 +828,154 @@ function recado(el, texto) {
   mostrar(el)
 }
 
-const formatar = (iso) => iso.split('-').reverse().join('/')
+// Tudo que vem do servidor entra por textContent, nunca como HTML: o motivo de
+// uma recusa é texto livre escrito por gente, e HTML montado com ele seria
+// código rodando na página do tipster.
+function el(tag, classe, texto) {
+  const no = document.createElement(tag)
+  if (classe) no.className = classe
+  if (texto != null) no.textContent = texto
+  return no
+}
+
+const formatar = (iso) => String(iso ?? '').split('-').reverse().join('/')
+const moeda = (n) => Number(n ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+// Timestamp do banco → o dia no fuso de quem está olhando.
+const diaDe = (ts) => (ts ? new Date(ts).toLocaleDateString('pt-BR') : '—')
+
+function hojeISO() {
+  const d = new Date()
+  const dois = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${dois(d.getMonth() + 1)}-${dois(d.getDate())}`
+}
+
+// ── servidor ─────────────────────────────────────────────────────────────
+// O erro carrega o status. 401 depois de logado quer dizer que a sessão
+// acabou, e a resposta certa é voltar para a tela de entrar — não um erro
+// vermelho no meio do formulário.
+
+async function api(caminho, { method = 'GET', body } = {}) {
+  const res = await fetch('/api/' + caminho, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  const dados = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    const erro = new Error(dados.erro || 'Deu erro aqui. Tente de novo.')
+    erro.status = res.status
+    throw erro
+  }
+  return dados
+}
+
+function falhou(err, elErro) {
+  if (err.status === 401) return irParaEntrar('Sua sessão terminou. Entre de novo.')
+  recado(elErro, err.message)
+}
+
+// ── telas ────────────────────────────────────────────────────────────────
+
+function irParaEntrar(aviso = '') {
+  esconder($('tela-app'))
+  mostrar($('tela-entrar'))
+  recado($('erro-conta'), aviso)
+}
+
+function irParaApp(conta) {
+  $('nome-conta').textContent = conta.nome
+  esconder($('tela-entrar'))
+  mostrar($('tela-app'))
+  trocarVista('nova')
+}
+
+// ── entrar / criar conta ─────────────────────────────────────────────────
+
+let modo = 'entrar'
+
+function trocarModo(novo) {
+  modo = novo
+  const criar = modo === 'criar'
+  for (const b of document.querySelectorAll('[data-modo]')) {
+    b.classList.toggle('ativa', b.dataset.modo === modo)
+  }
+  $('grupo-nome').classList.toggle('oculto', !criar)
+  $('dica-senha').classList.toggle('oculto', !criar)
+  $('conta-nome').required = criar
+  // O gerenciador de senhas do navegador lê isto: em "criar" ele sugere uma
+  // senha nova, em "entrar" preenche a que já guardou.
+  $('conta-senha').setAttribute('autocomplete', criar ? 'new-password' : 'current-password')
+  $('rotulo-conta').textContent = criar ? 'Criar conta' : 'Entrar'
+  recado($('erro-conta'), '')
+}
+
+for (const b of document.querySelectorAll('[data-modo]')) {
+  b.onclick = () => trocarModo(b.dataset.modo)
+}
+
+$('form-conta').onsubmit = async (e) => {
+  e.preventDefault()
+  recado($('erro-conta'), '')
+
+  const criar = modo === 'criar'
+  const btn = $('btn-conta')
+  btn.disabled = true
+  $('rotulo-conta').textContent = criar ? 'Criando a conta…' : 'Entrando…'
+
+  try {
+    const email = $('conta-email').value
+    const senha = $('conta-senha').value
+    const conta = criar
+      ? await api('conta', { method: 'POST', body: { nome: $('conta-nome').value, email, senha } })
+      : await api('sessao', { method: 'POST', body: { email, senha } })
+    $('conta-senha').value = ''
+    irParaApp(conta)
+  } catch (err) {
+    recado($('erro-conta'), err.message)
+  } finally {
+    btn.disabled = false
+    $('rotulo-conta').textContent = criar ? 'Criar conta' : 'Entrar'
+  }
+}
+
+$('btn-sair').onclick = async () => {
+  await api('sessao', { method: 'DELETE' }).catch(() => {})
+  // Nada da conta anterior pode ficar na tela para quem entrar em seguida no
+  // mesmo navegador.
+  limparFormulario()
+  solicitacoes = []
+  filtro = 'todas'
+  $('lista').replaceChildren()
+  $('filtros').replaceChildren()
+  $('conta-senha').value = ''
+  trocarModo('entrar')
+  irParaEntrar()
+}
+
+// ── vistas ───────────────────────────────────────────────────────────────
+
+function trocarVista(vista) {
+  for (const b of document.querySelectorAll('[data-vista]')) {
+    b.classList.toggle('ativa', b.dataset.vista === vista)
+  }
+  $('vista-nova').classList.toggle('oculto', vista !== 'nova')
+  $('vista-minhas').classList.toggle('oculto', vista !== 'minhas')
+  // Recarrega a cada visita: a resposta da equipe chega a qualquer momento, e
+  // uma lista guardada de dez minutos atrás diria "Em análise" para o que já
+  // foi aprovado.
+  if (vista === 'minhas') carregarLista()
+}
+
+for (const b of document.querySelectorAll('[data-vista]')) {
+  b.onclick = () => trocarVista(b.dataset.vista)
+}
+
+// ── nova solicitação ─────────────────────────────────────────────────────
+
+const form = $('form')
+const pronto = $('pronto')
+
+let datas = []
 
 function desenharChips() {
   $('chips').innerHTML = ''
@@ -556,45 +1022,166 @@ form.onsubmit = async (e) => {
   const btn = $('btn-salvar')
   const rotulo = $('rotulo-salvar')
   btn.disabled = true
-  rotulo.textContent = 'Cadastrando…'
+  rotulo.textContent = 'Enviando…'
 
   try {
-    const res = await fetch('/api/registrar', {
+    await api('registrar', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tipster_nome: $('tipster').value,
+      body: {
         stake: Number($('stake').value),
         link_bilhete: $('link').value,
         datas_confrontos: datas,
-      }),
+      },
     })
-    const dados = await res.json().catch(() => ({}))
-    if (!res.ok) throw new Error(dados.erro || 'Deu erro aqui. Tente de novo.')
-
-    $('quando').textContent = 'o jogo de ' + formatar(datas[datas.length - 1]) + ' terminar'
     esconder(form)
     mostrar(pronto)
   } catch (err) {
-    recado($('erro'), err.message)
+    falhou(err, $('erro'))
   } finally {
     btn.disabled = false
-    rotulo.textContent = 'Cadastrar bilhete'
+    rotulo.textContent = 'Enviar solicitação'
   }
 }
 
-$('btn-outro').onclick = () => {
-  // Guarda o tipster: são dez bilhetes seguidos do mesmo, e redigitar o nome a
-  // cada um é onde a grafia começa a variar.
-  const tipster = $('tipster').value
+function limparFormulario() {
   form.reset()
-  $('tipster').value = tipster
   datas = []
   desenharChips()
   recado($('erro'), '')
   esconder(pronto)
   mostrar(form)
 }
+
+$('btn-outro').onclick = limparFormulario
+
+$('btn-ver').onclick = () => {
+  limparFormulario()
+  trocarVista('minhas')
+}
+
+// ── minhas solicitações ──────────────────────────────────────────────────
+// `a_pagar` aparece como "Aprovado": para a equipe é a fila de pagamento, para
+// o tipster é a resposta que ele esperava.
+
+const STATUS = {
+  pendente: { rotulo: 'Em análise', filtro: 'Em análise', classe: 'analise' },
+  a_pagar: { rotulo: 'Aprovado', filtro: 'Aprovadas', classe: 'aprovado' },
+  recusado: { rotulo: 'Recusado', filtro: 'Recusadas', classe: 'recusado' },
+  pago: { rotulo: 'Pago', filtro: 'Pagas', classe: 'pago' },
+}
+
+let solicitacoes = []
+let filtro = 'todas'
+
+async function carregarLista() {
+  recado($('erro-lista'), '')
+  $('lista').replaceChildren(el('p', 'vazio', 'Carregando…'))
+  try {
+    const dados = await api('solicitacoes')
+    solicitacoes = dados.solicitacoes ?? []
+    desenharLista()
+  } catch (err) {
+    $('lista').replaceChildren()
+    falhou(err, $('erro-lista'))
+  }
+}
+
+function desenharLista() {
+  const contagem = { todas: solicitacoes.length }
+  for (const s of solicitacoes) contagem[s.status] = (contagem[s.status] ?? 0) + 1
+
+  const opcoes = [['todas', 'Todas'], ...Object.entries(STATUS).map(([id, s]) => [id, s.filtro])]
+  $('filtros').replaceChildren(
+    ...opcoes.map(([id, rotulo]) => {
+      const b = el('button', 'filtro' + (id === filtro ? ' ativo' : ''), rotulo)
+      b.type = 'button'
+      b.append(el('span', 'filtro-num', String(contagem[id] ?? 0)))
+      b.onclick = () => {
+        filtro = id
+        desenharLista()
+      }
+      return b
+    }),
+  )
+
+  const visiveis = filtro === 'todas' ? solicitacoes : solicitacoes.filter((s) => s.status === filtro)
+
+  if (!visiveis.length) {
+    const texto = solicitacoes.length
+      ? 'Nenhuma solicitação com este status.'
+      : 'Você ainda não enviou nenhuma solicitação.'
+    return $('lista').replaceChildren(el('p', 'vazio', texto))
+  }
+
+  $('lista').replaceChildren(...visiveis.map(cartaoDaSolicitacao))
+}
+
+function cartaoDaSolicitacao(s) {
+  const st = STATUS[s.status] ?? { rotulo: s.status, classe: 'analise' }
+  const cartao = el('article', 'item item-' + st.classe)
+
+  const topo = el('div', 'item-topo')
+  topo.append(el('strong', 'item-valor', moeda(s.stake)), el('span', 'tag tag-' + st.classe, st.rotulo))
+
+  const linha = el('div', 'item-linha')
+  linha.append(el('span', '', (s.datas_confrontos ?? []).map(formatar).join(' · ') || '—'))
+
+  // Só vira link se for http(s). O servidor já recusa o resto no envio; isto
+  // garante que um `javascript:` nunca chegue a ser clicável aqui.
+  if (/^https?:\/\//i.test(s.link_bilhete ?? '')) {
+    const a = el('a', 'item-link', 'abrir bilhete')
+    a.href = s.link_bilhete
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer'
+    linha.append(a)
+  }
+
+  cartao.append(topo, linha, el('p', 'item-quando', quando(s)))
+
+  if (s.status === 'a_pagar') {
+    const texto =
+      (s.confronto_fim ?? '') >= hojeISO()
+        ? `O reembolso sai depois que o último jogo (${formatar(s.confronto_fim)}) terminar.`
+        : 'Na fila de reembolso.'
+    cartao.append(el('p', 'item-dica', texto))
+  }
+
+  if (s.status === 'recusado') {
+    const motivo = el('div', 'motivo')
+    motivo.append(
+      el('span', 'motivo-rotulo', 'Motivo da recusa'),
+      el('p', '', s.motivo_recusa || 'A equipe não informou o motivo.'),
+      el('p', 'motivo-dica', 'Se foi um engano no envio, corrija e envie de novo — o mesmo link pode ser usado.'),
+    )
+    cartao.append(motivo)
+  }
+
+  return cartao
+}
+
+function quando(s) {
+  const partes = ['Enviado em ' + diaDe(s.enviado_em)]
+  if (s.status === 'a_pagar' && s.aprovado_em) partes.push('aprovado em ' + diaDe(s.aprovado_em))
+  if (s.status === 'recusado' && s.recusado_em) partes.push('recusado em ' + diaDe(s.recusado_em))
+  if (s.status === 'pago' && s.pago_em) partes.push('pago em ' + diaDe(s.pago_em))
+  return partes.join(' · ')
+}
+
+// ── início ───────────────────────────────────────────────────────────────
+// A primeira pergunta é "tem alguém logado?". Até ela voltar, nenhuma das
+// duas telas aparece — senão quem já entrou veria o login piscar a cada visita.
+
+async function iniciar() {
+  try {
+    irParaApp(await api('conta'))
+  } catch (err) {
+    irParaEntrar(err.status === 401 ? '' : err.message)
+  } finally {
+    esconder($('carregando'))
+  }
+}
+
+iniciar()
 </script>
 
 </body>

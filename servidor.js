@@ -35,7 +35,9 @@ function carregarEnv() {
     process.env[chave] = bruto.trim().replace(/^["']|["']$/g, '')
   }
 
-  const faltando = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'].filter((v) => !process.env[v])
+  const faltando = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SESSAO_SEGREDO'].filter(
+    (v) => !process.env[v],
+  )
   if (faltando.length) {
     console.error(`\n  Faltam variáveis no .env: ${faltando.join(', ')}\n`)
     process.exit(1)
