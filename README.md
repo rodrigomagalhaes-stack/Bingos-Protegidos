@@ -22,8 +22,8 @@ precisa ter sido aplicado antes de este formulário servir para alguma coisa.
 
 ## O caminho de uma solicitação
 
-1. O tipster cria a conta (nome de tipster, e-mail e senha) ou entra.
-2. Envia o bilhete: stake, link e as datas dos confrontos. Ele nasce
+1. Quem envia cria a conta (nome, e-mail e senha) ou entra.
+2. Envia o bilhete: nome do tipster, stake, link e as datas dos confrontos. Ele nasce
    **Em análise** (`pendente` no banco).
 3. No BI, a equipe aprova ou recusa na caixa **Solicitações**. Recusar exige
    motivo.
@@ -53,13 +53,13 @@ nenhuma: nem o BI logado lê o hash das senhas.
   por cima da trava.
 
 O cadastro de conta é livre, sem aprovação. O que protege o caixa é a análise de
-cada bilhete no BI, o índice único do link e duas travas na conta:
+cada bilhete no BI e o índice único do link.
 
-- **o nome de tipster é único** — sem caixa, acento nem espaço sobrando, a mesma
-  fórmula de `tipster_chave`. É por ele que o BI agrupa: ninguém cria a conta
-  "Rodrigo" e soma bilhetes aos do Rodrigo de verdade.
-- **o nome vem da conta**, nunca do corpo da requisição: uma conta não pede em
-  nome de outro tipster.
+O **nome do tipster é digitado em cada solicitação**, e não vem da conta: quem
+entra pode mandar bilhetes de mais de um tipster, e é esse nome que a equipe vê.
+De qual conta veio fica gravado à parte (`conta_id` e `enviado_por`, o e-mail),
+então o BI sempre sabe quem enviou. O campo sugere os nomes que a conta já usou e
+lembra o último, para "Rodrigo" não virar "Rodrigo M." no envio seguinte.
 
 **Esqueci a senha** ainda não existe — este projeto não envia e-mail.
 

@@ -11,6 +11,7 @@ import { falhaInesperada } from './_erros.js'
 
 const CAMPOS = [
   'id',
+  'tipster_nome',
   'stake',
   'link_bilhete',
   'datas_confrontos',

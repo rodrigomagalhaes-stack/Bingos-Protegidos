@@ -37,8 +37,8 @@ async function criar(req, res) {
   // e a nova tentativa já esbarraria em "este e-mail já tem conta".
   exigirSegredo()
 
-  // Espaço sobrando some aqui: este nome vira `tipster_nome` em cada bilhete, e
-  // o BI agrupa por ele.
+  // O nome de quem entra. Não é o do tipster: esse é digitado em cada
+  // solicitação, porque uma conta pode mandar bilhetes de mais de um.
   const nome = String(req.body?.nome ?? '').trim().replace(/\s+/g, ' ')
   const email = String(req.body?.email ?? '').trim()
   const senha = String(req.body?.senha ?? '')
@@ -56,22 +56,20 @@ async function criar(req, res) {
     abrirSessao(req, res, conta.id)
     return res.status(201).json({ nome: conta.nome, email: conta.email })
   } catch (e) {
-    // Dois índices únicos, duas mensagens. O nome repetido precisa dizer que é
-    // o NOME, senão a pessoa troca o e-mail e tenta de novo sem entender.
+    // O único índice único que sobra é o do e-mail. A mensagem genérica cobre
+    // um banco em que o SQL novo ainda não rodou e o nome continua único lá.
     if (e.detalhe?.code === '23505') {
-      if (String(e.detalhe.message ?? '').includes('protegidos_contas_nome_uk')) {
-        return res.status(409).json({
-          erro: 'Já existe uma conta com este nome de tipster. Se ela é sua, use "Entrar".',
-        })
+      if (String(e.detalhe.message ?? '').includes('protegidos_contas_email_uk')) {
+        return res.status(409).json({ erro: 'Este e-mail já tem conta. Use "Entrar".' })
       }
-      return res.status(409).json({ erro: 'Este e-mail já tem conta. Use "Entrar".' })
+      return res.status(409).json({ erro: 'Já existe uma conta com esses dados. Tente outro nome.' })
     }
     throw e
   }
 }
 
 function validar({ nome, email, senha }) {
-  if (!nome) return 'Escreva o seu nome de tipster.'
+  if (!nome) return 'Escreva o seu nome.'
   if (nome.length > LIMITE_NOME) return 'O nome está longo demais.'
   if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return 'Este e-mail não parece completo.'

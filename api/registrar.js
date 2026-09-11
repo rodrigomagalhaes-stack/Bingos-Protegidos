@@ -10,15 +10,17 @@ import { falhaInesperada } from './_erros.js'
 // navegador serve para a pessoa não errar; esta serve para o sistema não ser
 // enganado.
 //
-// Só entra com conta logada, e o nome do tipster vem da CONTA, nunca do corpo
-// da requisição: aceitar um nome enviado deixaria qualquer conta pedir em nome
-// de outro tipster. O bilhete nasce `pendente` e só chega à fila de pagamento
-// depois que alguém da equipe aprova no BI.
+// Só entra com conta logada. O nome do tipster vem do formulário, e não da
+// conta: quem entra pode mandar bilhetes de mais de um tipster. De qual conta
+// veio fica gravado à parte (`conta_id`, `enviado_por`), então a equipe sempre
+// sabe quem enviou, seja qual for o nome digitado. O bilhete nasce `pendente` e
+// só chega à fila de pagamento depois que alguém da equipe aprova no BI.
 //
 // A trava contra o mesmo bilhete duas vezes continua sendo o índice único do
 // link, no banco — cadastrar duas vezes é reembolsar duas vezes.
 
 const LIMITE_DATAS = 20
+const LIMITE_TEXTO = 120
 const LIMITE_OBSERVACAO = 500
 
 export default async function handler(req, res) {
@@ -27,9 +29,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ erro: 'Método não permitido.' })
   }
 
-  const { stake, link_bilhete, datas_confrontos, observacao } = req.body ?? {}
+  const { tipster_nome, stake, link_bilhete, datas_confrontos, observacao } = req.body ?? {}
 
-  const erro = validar({ stake, link_bilhete, datas_confrontos })
+  const erro = validar({ tipster_nome, stake, link_bilhete, datas_confrontos })
   if (erro) return res.status(400).json({ erro })
 
   try {
@@ -41,7 +43,10 @@ export default async function handler(req, res) {
       headers: { Prefer: 'return=representation' },
       body: {
         conta_id: conta.id,
-        tipster_nome: conta.nome,
+        // Espaço sobrando some aqui: o BI agrupa por este nome, e "João " e
+        // "João" seriam dois tipsters em toda soma. O resto da normalização
+        // (caixa, acento) é a coluna gerada `tipster_chave`, no banco.
+        tipster_nome: String(tipster_nome).trim().replace(/\s+/g, ' '),
         enviado_por: conta.email,
         // Escrito, e não deixado ao padrão da coluna: é a regra que manda o
         // bilhete para a análise, e ela não pode depender de o banco estar na
@@ -76,7 +81,11 @@ export default async function handler(req, res) {
   }
 }
 
-function validar({ stake, link_bilhete, datas_confrontos }) {
+function validar({ tipster_nome, stake, link_bilhete, datas_confrontos }) {
+  const nome = String(tipster_nome ?? '').trim()
+  if (!nome) return 'Escreva o nome do tipster.'
+  if (nome.length > LIMITE_TEXTO) return 'O nome do tipster está longo demais.'
+
   const valor = Number(stake)
   if (!Number.isFinite(valor) || valor <= 0) return 'A stake precisa ser um número maior que zero.'
 

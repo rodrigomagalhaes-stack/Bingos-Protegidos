@@ -489,10 +489,13 @@
     margin-bottom: 8px;
   }
 
-  .item-valor {
+  .item-nome {
+    min-width: 0;
+    overflow: hidden;
     font-size: 17px;
     font-weight: 800;
-    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .tag {
@@ -614,9 +617,8 @@
             <circle cx="12" cy="8" r="3.6" />
             <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
           </svg>
-          Nome de tipster
+          Seu nome
         </div>
-        <p class="dica">É o nome que a equipe vê em cada bilhete seu</p>
         <div class="campo">
           <span class="campo-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -625,7 +627,7 @@
               <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
             </svg>
           </span>
-          <input type="text" id="conta-nome" placeholder="Como você é conhecido" autocomplete="nickname" maxlength="120" />
+          <input type="text" id="conta-nome" placeholder="Digite o seu nome" autocomplete="name" maxlength="120" />
         </div>
       </div>
 
@@ -701,6 +703,30 @@
 
     <div id="vista-nova">
       <form class="cartao" id="form">
+        <div class="grupo">
+          <div class="rotulo">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.6" />
+              <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
+            </svg>
+            Nome do tipster
+          </div>
+          <p class="dica">É o nome que a equipe vê neste bilhete</p>
+          <div class="campo">
+            <span class="campo-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8" r="3.6" />
+                <path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8" />
+              </svg>
+            </span>
+            <input type="text" id="tipster" list="tipsters-usados" placeholder="Digite o nome do tipster"
+                   autocomplete="off" maxlength="120" required />
+            <datalist id="tipsters-usados"></datalist>
+          </div>
+        </div>
+
         <div class="grupo">
           <div class="rotulo">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -882,11 +908,24 @@ function irParaEntrar(aviso = '') {
   recado($('erro-conta'), aviso)
 }
 
+let contaAtual = null
+
 function irParaApp(conta) {
+  contaAtual = conta
   $('nome-conta').textContent = conta.nome
+  if (!$('tipster').value) $('tipster').value = ultimoTipster()
   esconder($('tela-entrar'))
   mostrar($('tela-app'))
   trocarVista('nova')
+
+  // As sugestões do campo de tipster saem das solicitações da própria conta.
+  // Falhar aqui não atrapalha nada: o campo só fica sem sugestão.
+  api('solicitacoes')
+    .then((dados) => {
+      solicitacoes = dados.solicitacoes ?? []
+      preencherSugestoes()
+    })
+    .catch(() => {})
 }
 
 // ── entrar / criar conta ─────────────────────────────────────────────────
@@ -943,6 +982,8 @@ $('btn-sair').onclick = async () => {
   // Nada da conta anterior pode ficar na tela para quem entrar em seguida no
   // mesmo navegador.
   limparFormulario()
+  $('tipsters-usados').replaceChildren()
+  contaAtual = null
   solicitacoes = []
   filtro = 'todas'
   $('lista').replaceChildren()
@@ -1028,11 +1069,13 @@ form.onsubmit = async (e) => {
     await api('registrar', {
       method: 'POST',
       body: {
+        tipster_nome: $('tipster').value,
         stake: Number($('stake').value),
         link_bilhete: $('link').value,
         datas_confrontos: datas,
       },
     })
+    lembrarTipster($('tipster').value)
     esconder(form)
     mostrar(pronto)
   } catch (err) {
@@ -1043,8 +1086,12 @@ form.onsubmit = async (e) => {
   }
 }
 
-function limparFormulario() {
+// "Enviar outra" guarda o tipster: costumam ser vários bilhetes seguidos do
+// mesmo, e redigitar o nome a cada um é onde a grafia começa a variar.
+function limparFormulario({ manterTipster = false } = {}) {
+  const tipster = $('tipster').value
   form.reset()
+  if (manterTipster) $('tipster').value = tipster
   datas = []
   desenharChips()
   recado($('erro'), '')
@@ -1052,7 +1099,42 @@ function limparFormulario() {
   mostrar(form)
 }
 
-$('btn-outro').onclick = limparFormulario
+// O último tipster usado por ESTA conta neste navegador, para o campo já vir
+// preenchido. A chave leva o e-mail: duas pessoas no mesmo computador não
+// herdam o tipster uma da outra. Sem localStorage (aba anônima com bloqueio)
+// o campo só vem vazio.
+const chaveTipster = () => 'bp_tipster:' + String(contaAtual?.email ?? '').toLowerCase()
+
+function lembrarTipster(nome) {
+  try {
+    localStorage.setItem(chaveTipster(), nome.trim())
+  } catch {
+    // sem armazenamento, sem lembrança
+  }
+}
+
+function ultimoTipster() {
+  try {
+    return localStorage.getItem(chaveTipster()) || ''
+  } catch {
+    return ''
+  }
+}
+
+// Os nomes que a conta já usou viram sugestão no campo. É o que segura
+// "Rodrigo" num envio e "Rodrigo M." no outro — dois tipsters para o BI.
+function preencherSugestoes() {
+  const nomes = [...new Set(solicitacoes.map((s) => s.tipster_nome).filter(Boolean))]
+  $('tipsters-usados').replaceChildren(
+    ...nomes.map((nome) => {
+      const opcao = document.createElement('option')
+      opcao.value = nome
+      return opcao
+    }),
+  )
+}
+
+$('btn-outro').onclick = () => limparFormulario({ manterTipster: true })
 
 $('btn-ver').onclick = () => {
   limparFormulario()
@@ -1079,6 +1161,7 @@ async function carregarLista() {
   try {
     const dados = await api('solicitacoes')
     solicitacoes = dados.solicitacoes ?? []
+    preencherSugestoes()
     desenharLista()
   } catch (err) {
     $('lista').replaceChildren()
@@ -1120,11 +1203,13 @@ function cartaoDaSolicitacao(s) {
   const st = STATUS[s.status] ?? { rotulo: s.status, classe: 'analise' }
   const cartao = el('article', 'item item-' + st.classe)
 
+  // Uma conta manda bilhetes de mais de um tipster, então o nome vai no topo.
   const topo = el('div', 'item-topo')
-  topo.append(el('strong', 'item-valor', moeda(s.stake)), el('span', 'tag tag-' + st.classe, st.rotulo))
+  topo.append(el('strong', 'item-nome', s.tipster_nome || '—'), el('span', 'tag tag-' + st.classe, st.rotulo))
 
   const linha = el('div', 'item-linha')
-  linha.append(el('span', '', (s.datas_confrontos ?? []).map(formatar).join(' · ') || '—'))
+  const datasTexto = (s.datas_confrontos ?? []).map(formatar).join(' · ') || '—'
+  linha.append(el('span', '', `${moeda(s.stake)} · ${datasTexto}`))
 
   // Só vira link se for http(s). O servidor já recusa o resto no envio; isto
   // garante que um `javascript:` nunca chegue a ser clicável aqui.
