@@ -11,6 +11,7 @@ import { falhaInesperada } from './_erros.js'
 // fica na análise de cada bilhete, no BI.
 
 const LIMITE_NOME = 120
+const LIMITE_AFILIADO = 64
 const SENHA_MINIMA = 8
 const SENHA_MAXIMA = 200
 
@@ -40,17 +41,18 @@ async function criar(req, res) {
   // O nome de quem entra. Não é o do tipster: esse é digitado em cada
   // solicitação, porque uma conta pode mandar bilhetes de mais de um.
   const nome = String(req.body?.nome ?? '').trim().replace(/\s+/g, ' ')
+  const afiliadoId = String(req.body?.afiliado_id ?? '').trim()
   const email = String(req.body?.email ?? '').trim()
   const senha = String(req.body?.senha ?? '')
 
-  const erro = validar({ nome, email, senha })
+  const erro = validar({ nome, afiliadoId, email, senha })
   if (erro) return res.status(400).json({ erro })
 
   try {
     const [conta] = await rest('protegidos_contas?select=id,nome,email', {
       method: 'POST',
       headers: { Prefer: 'return=representation' },
-      body: { nome, email, senha_hash: await gerarHash(senha) },
+      body: { nome, afiliado_id: afiliadoId, email, senha_hash: await gerarHash(senha) },
     })
 
     abrirSessao(req, res, conta.id)
@@ -68,9 +70,15 @@ async function criar(req, res) {
   }
 }
 
-function validar({ nome, email, senha }) {
+function validar({ nome, afiliadoId, email, senha }) {
   if (!nome) return 'Escreva o seu nome.'
   if (nome.length > LIMITE_NOME) return 'O nome está longo demais.'
+  if (!afiliadoId) return 'Informe o seu Id do afiliado.'
+  // Sem formato fixo além disso: não há garantia de que todo Id seja só
+  // número, e recusar um Id legítimo trancaria a pessoa fora do cadastro.
+  if (afiliadoId.length > LIMITE_AFILIADO || !/^[A-Za-z0-9_.-]+$/.test(afiliadoId)) {
+    return 'O Id do afiliado só aceita letras, números, ponto, hífen e sublinhado.'
+  }
   if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return 'Este e-mail não parece completo.'
   }

@@ -22,8 +22,10 @@ precisa ter sido aplicado antes de este formulário servir para alguma coisa.
 
 ## O caminho de uma solicitação
 
-1. Quem envia cria a conta (nome, e-mail e senha) ou entra.
-2. Envia o bilhete: nome do tipster, stake, link e as datas dos confrontos. Ele nasce
+1. Quem envia cria a conta (nome, Id do afiliado, e-mail e senha) ou entra. O Id
+   do afiliado é copiado em cada solicitação e aparece para a equipe no BI.
+2. Envia o bilhete: nome do tipster, stake e o link de compartilhar. As datas dos
+   jogos saem do próprio bilhete (ver abaixo). Ele nasce
    **Em análise** (`pendente` no banco).
 3. No BI, a equipe aprova ou recusa na caixa **Solicitações**. Recusar exige
    motivo.
@@ -33,6 +35,28 @@ precisa ter sido aplicado antes de este formulário servir para alguma coisa.
 
 Um bilhete recusado pode ser enviado de novo — a trava de link duplicado ignora
 os recusados.
+
+## As datas saem do bilhete
+
+O formulário não pergunta quando são os jogos. O link de compartilhar da
+Esportiva traz o código do bilhete (`?shareCode=`, inclusive nos links de
+afiliado `go.aff.esportiva.bet`), e `api/registrar.js` lê esse código no
+`Storage/GetValue` do Altenar — um GET público, sem login, que devolve as
+seleções com o horário de cada jogo. As datas são o dia de cada jogo no horário
+de Brasília, e as linhas lidas ficam guardadas no bilhete para o BI mostrar.
+
+É a data do último jogo que decide quando o bilhete pode ser pago, e ela deixou
+de depender de alguém digitar certo. O preço é depender do Altenar no envio:
+
+- link **sem código** (o da página do jogo, por exemplo) é recusado;
+- código que o Altenar **não encontra** é recusado;
+- Altenar **fora do ar** devolve "tente de novo em alguns instantes".
+
+Não é API oficial. Se um dia ela mudar, os envios param com essa última
+mensagem, e o caminho é voltar a pedir as datas no formulário.
+
+`api/_bilhete.js` é o mesmo leitor de `server/protegidos/bilhete.js` do BI: o
+formato gravado na coluna `bilhete` tem de ser igual dos dois lados.
 
 ## O login não é o do Supabase
 
